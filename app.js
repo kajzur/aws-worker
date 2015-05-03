@@ -27,7 +27,22 @@ AWS.config.loadFromPath(AWS_CONFIG_FILE);
 				helpers.calculateMultiDigest(result.Body, ['md5', 'sha1','sha512','sha256'], 
 				function(err, digests) {
 
-					console.log(digests);
+					var simpledb = new AWS.SimpleDB();
+					var dbParams = {
+					  Attributes: [ /* required */
+					  	{
+					    	Name:"digest",
+					    	Value: JSON.stringify(digests),
+					    	Replace: false
+					    }
+					  ],
+					  DomainName: 'mateuszmDomain', /* required */
+					  ItemName: dataInArray[1] /* required */
+					};
+					simpledb.putAttributes(dbParams, function(err, data) {
+					  if (err) console.log(err, err.stack); // an error occurred
+					  else     console.log(data);           // successful response
+					});
 				
 				}, 1);
 			});
